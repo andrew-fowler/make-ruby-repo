@@ -1,0 +1,116 @@
+#!/bin/bash
+RED='\033[0;31m'
+NC='\033[0m'
+WHITE='\033[1;37m'
+GREEN='\033[0;32m'
+COMMIT_MESG='Initial Commit'
+
+clear
+echo "Please enter the repo name to use (no spaces): "
+read repo_name
+echo "Please enter your GitHub name (no spaces): "
+read github_name
+
+function make_dir {
+    echo -e "${WHITE}Making directory: ${NC}./$1/"
+    mkdir $1
+}
+
+function goto_dir {
+    echo -e "${WHITE}Going into directory: ${NC}./$1/"
+    cd $1
+}
+
+function download_gitignore {
+    echo -e "${WHITE}Downloading .gitignore${NC}"
+    wget https://raw.githubusercontent.com/github/gitignore/master/Ruby.gitignore -O .gitignore > /dev/null 2>&1
+}
+
+function download_readme {
+    echo -e "${WHITE}Downloading README.md${NC}"
+    wget https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/824da51d0763e6855c338cc8107b2ff890e7dd43/README-Template.md -O README.md > /dev/null 2>&1
+    sed -i '' -e "s/Project Title/"$1"/g" ./README.md
+}
+
+function git_init {
+    echo -e "${WHITE}Initializing new Git repository${NC}"
+    git init  > /dev/null 2>&1
+}
+
+function git_add {
+    echo -e "${WHITE}Adding README.md and .gitignore for staging${NC}"
+    git add $1
+}
+
+function git_commit {
+    echo -e "${WHITE}Committing README.md and .gitignore${NC}"
+    git commit -m "$1"
+}
+
+function prompt_create_remote_repo {
+  echo -e "1) Go to ${WHITE}https://github.com/new${NC} and create a new repo named '${WHITE}$1${NC}'"
+}
+
+function prompt_add_origin {
+  #git@github.com:andrew-fowler/calculator.git
+  #git@github.com:$1/$2.git
+  echo -e "2) Run ${RED}git remote add origin${NC} ${WHITE}git@github.com:$1/$2.git${NC}"
+#  echo -e "2) Run '${RED}git remote add origin${NC} ${WHITE}http://github.com/$1/$2.git${NC}'"
+}
+
+function prompt_push {
+  echo -e "3) Run ${RED}git push origin master${NC}"
+}
+
+function prompt_check_github {
+  echo -e "4) Go to ${WHITE}https://github.com/$1/$2${NC} to check your project"
+}
+
+function next_steps {
+  echo
+  echo "Next Steps"
+  echo "----------"
+  echo
+}
+
+clear
+make_dir ${repo_name}
+goto_dir ${repo_name}
+download_gitignore
+download_readme
+# download contribution md ?
+# download license ?
+git_init
+git_add .
+git_commit ${COMMIT_MESG}
+next_steps
+prompt_create_remote_repo ${repo_name}
+prompt_add_origin ${github_name} ${repo_name}
+prompt_push
+prompt_check_github ${github_name} ${repo_name}
+echo
+#
+# if [[ -n "$1" ]]; then
+#     clear
+#
+#     mkdir $1
+#     echo -e "${WHITE}Created directory ./"$1"/${NC}"
+#     cd $1
+#     wget https://raw.githubusercontent.com/github/gitignore/master/Ruby.gitignore -O .gitignore > /dev/null 2>&1
+#     echo -e "${WHITE}Created file ./"$1"/.gitignore"${NC}
+#     wget https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/824da51d0763e6855c338cc8107b2ff890e7dd43/README-Template.md -O README.md > /dev/null 2>&1
+#     sed -i '' -e "s/Project Title/"$1"/g" ./README.md
+#     echo -e "${WHITE}Created file ./"$1"/README.md${NC}"
+#     git init
+#     echo -e "${WHITE}Initialized Git repository in ./"$1"/${NC}"
+#     git add .
+#     echo -e "${WHITE}Added README.md and .gitignore for staging${NC}"
+#     git commit -m "${COMMIT_MESG}"
+#     echo -e "${WHITE}Committed files with message '${NC}${GREEN}${COMMIT_MESG}${WHITE}'${NC}"
+#     echo -e "Please now run '${RED}git remote add origin${NC} ${WHITE}<Your git URL>${NC}'"
+#     echo -e "Then run '${RED}git push origin master${NC}'"
+#     cd ..
+#     rm -rf $1
+# else
+#     echo ${RED}"Argument error - Please provide a Repo name"${NC}
+# fi
